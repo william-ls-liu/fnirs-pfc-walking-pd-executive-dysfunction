@@ -1,1 +1,1 @@
-# fnirs-pfc-walking-pd-executive-dysfunction
+# Code for processing fNIRS data
