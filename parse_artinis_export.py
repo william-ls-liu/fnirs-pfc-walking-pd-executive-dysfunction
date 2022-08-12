@@ -6,5 +6,3 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
         lines = f.read().split('\n')
     
     return lines
-
-print(parse_artinis_export('fnirs-pfc-walking-pd-executive-dysfunction/test_data/Turn_129_LongWalk_ST.txt'))
