@@ -7,14 +7,17 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
         # Split the .txt file into lines
         lines = f.read().split('\n')
 
-        # Split each line into 'columns'
+        # Split each line into columns
         rows = [[i for i in j.split('\t')] for j in lines]
 
-        # Get column labels to use for DataFrame
+        # Get column labels to use for DataFrame, also get sample rate
         start = None
         end = None
+        sample_rate = None
         for idx, row in enumerate(rows):
-            if "(Sample number)" in row:
+            if "Datafile sample rate:" in row:
+                sample_rate = int(float(row[1]))
+            elif "(Sample number)" in row:
                 start = idx
             elif "(Event)" in row:
                 end = idx
@@ -45,5 +48,8 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
                 Expected {len(col_labels)}, found {len(row)}.""")
         
         df = pd.DataFrame(data=data, columns=col_labels)
+
+        # Drop initial 1 second of recording
+        df.drop(df.index[range(sample_rate)], inplace=True)
 
     return df
