@@ -3,8 +3,10 @@ import pandas as pd
 def parse_artinis_export(file_path: str) -> pd.DataFrame:
     """Read the exported file from Artinis fNIRS software and parse into a pandas DataFrame."""
     with open(file_path, 'r') as f:
+
         # Split the .txt file into lines
         lines = f.read().split('\n')
+
         # Split each line into 'columns'
         rows = [[i for i in j.split('\t')] for j in lines]
 
@@ -17,7 +19,7 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
             elif "(Event)" in row:
                 end = idx
                 break
-        col_labels = rows[start: (end + 1)]
+        col_labels = rows[start:(end + 1)]
         col_labels = [i[1] for i in col_labels]
 
         # Remove extra characters from column labels
@@ -31,4 +33,17 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
             else:
                 raise KeyError(f"Unexpected value found in column labels: {label}")
 
-    return col_labels
+        # Create DataFrame
+        data = rows[(end + 4):-1]  # Last line is empty, ignore it
+        for idx, row in enumerate(data):
+            if len(row) == len(col_labels) + 1:
+                data[idx].pop()
+            elif len(row) == len(col_labels):
+                pass
+            else:
+                raise ValueError(f"""Unexpected number of items in row {idx}. 
+                Expected {len(col_labels)}, found {len(row)}.""")
+        
+        df = pd.DataFrame(data=data, columns=col_labels)
+
+    return df
