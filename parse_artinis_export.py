@@ -22,8 +22,11 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
             elif "(Event)" in row:
                 end = idx
                 break
-        col_labels = rows[start:(end + 1)]
-        col_labels = [i[1] for i in col_labels]
+        if start is not None and end is not None and sample_rate is not None:
+            col_labels = rows[start:(end + 1)]
+            col_labels = [i[1] for i in col_labels]
+        else:
+            raise ValueError(f"Could not find start, end, or sample rate in the .txt file. Start: {start}, end: {end}, sample_rate: {sample_rate}")
 
         # Remove extra characters from column labels
         for idx, label in enumerate(col_labels):
