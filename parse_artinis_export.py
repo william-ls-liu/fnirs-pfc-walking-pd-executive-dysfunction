@@ -1,4 +1,6 @@
+from importlib.metadata import metadata
 import pandas as pd
+
 
 def parse_artinis_export(file_path: str) -> pd.DataFrame:
     """Read the exported file from Artinis fNIRS software and parse into a pandas DataFrame."""
@@ -9,11 +11,32 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
 
     if lines is None:
         raise AttributeError(f"Could not open {file_path}.")
-        
+
     # Split each line into columns
     rows = [[i for i in j.split('\t')] for j in lines]
 
-    # Get column labels to use for DataFrame, also get sample rate
+    metadata = read_metadata(rows)
+    df = read_data(rows)
+
+    return metadata, df
+
+
+def read_metadata(rows: list) -> dict:
+    metadata = dict()
+    for i in range(7):
+        row = rows[i]
+        if '' in row:
+            pass
+        elif 'OxySoft export of:' in row:
+            metadata['Original file'] = row[1]
+        else:
+            metadata[row[0]] = row[1]
+
+    return metadata
+
+
+def read_data(rows: list) -> pd.DataFrame:
+# Get column labels to use for DataFrame, also get sample rate
     start = None
     end = None
     sample_rate = None
