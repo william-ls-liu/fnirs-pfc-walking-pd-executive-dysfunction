@@ -56,3 +56,4 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
         df.drop(df.index[range(sample_rate)], inplace=True)
 
     return df
+    
