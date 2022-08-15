@@ -1,3 +1,4 @@
+from dataclasses import dataclass
 import pandas as pd
 
 
@@ -17,7 +18,7 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
     metadata = read_metadata(rows)
     df = read_data(rows)
 
-    return metadata, df
+    return {'metadata': metadata, 'data': df}
 
 
 def read_metadata(rows: list) -> dict:
