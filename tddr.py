@@ -71,7 +71,8 @@ def tddr(data: np.array, sample_rate: int) -> np.array:
     signal_low_corrected = np.cumsum(np.insert(new_deriv, 0, 0.0))
 
     # Postprocess: Center the corrected signal
-    signal_low_corrected = signal_low_corrected - np.mean(signal_low_corrected)
+    signal_low_corrected_mean = math.fsum(signal_low_corrected) / len(signal_low_corrected)
+    signal_low_corrected = signal_low_corrected - signal_low_corrected_mean
 
     # Postprocess: Merge back with uncorrected high frequency component
     signal_corrected = signal_low_corrected + signal_high + signal_mean
