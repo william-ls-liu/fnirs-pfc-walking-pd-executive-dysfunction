@@ -1,4 +1,3 @@
-from importlib.metadata import metadata
 import pandas as pd
 
 
@@ -81,5 +80,7 @@ def read_data(rows: list) -> pd.DataFrame:
 
     # Drop initial 1 second of recording
     df.drop(df.index[range(sample_rate)], inplace=True)
+    # Cast columns to most logical dtype
+    df = df.apply(pd.to_numeric, errors='ignore')
 
     return df
