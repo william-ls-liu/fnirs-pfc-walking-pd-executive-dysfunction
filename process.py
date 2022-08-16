@@ -1,14 +1,18 @@
-from parse_artinis_export import parse_artinis_export
+from short_channel_correction import short_channel_correction
 import pandas as pd
-import os
 import re
 import numpy as np
-from scipy.signal import butter, sosfiltfilt
-import math
 from typing import Union
 
-def process():
-    pass
+
+def process(data: dict, short_chs: list):
+    raw = data['data']
+    metadata = data['metadata']
+    short_data, long_data, events = _transform_data(raw, short_chs)
+    short_channel_corrected = short_channel_correction(long_data, short_data)
+
+    return short_channel_corrected
+
 
 def _transform_data(df: pd.DataFrame, short_chs: list) -> Union[np.array, pd.DataFrame]:
     """
