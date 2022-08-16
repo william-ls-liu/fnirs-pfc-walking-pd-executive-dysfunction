@@ -10,15 +10,26 @@ from typing import Union
 def process():
     pass
 
-def _transform_data(df: pd.DataFrame) -> Union[np.array, pd.DataFrame]:
+def _transform_data(df: pd.DataFrame, short_chs: list) -> Union[np.array, pd.DataFrame]:
     """
-    Create a numpy array of raw data from the DataFrame. Return numpy array without "Sample number" or "Event columns.
-    Return a separate DataFrame with only the rows containing Event markers.
+    Separate raw data into separate DataFrames for the long and short channels. Return a separate DataFrame with only 
+    the rows containing Event markers.
     """
-    # DataFrame to numpy array
-    df_asarray = df.iloc[:, 1:-1].to_numpy(dtype=np.float64)
+    # Get DataFrame with only the short channels
+    short_regex = '|'.join(short_chs)
+    short_data = df.filter(regex=short_regex)
+
+    # Get DataFrame with only the long channels
+    all_chs = list(df.columns)
+    long_chs = list()
+    for channel in all_chs:
+        if not ('Sample number' in channel or 'Event' in channel):
+            if not re.match(short_regex, channel):
+                long_chs.append(channel)
+    long_regex = '|'.join(long_chs)
+    long_data = df.filter(regex=long_regex)
 
     # DataFrame of events
     events = df[df['Event'] != '']
 
-    return df_asarray, events
+    return short_data, long_data, events
