@@ -14,13 +14,13 @@ def parse_artinis_export(file_path: str) -> pd.DataFrame:
     # Split each line into columns
     rows = [[i for i in j.split('\t')] for j in lines]
 
-    metadata = read_metadata(rows)
-    df = read_data(rows)
+    metadata = _read_metadata(rows)
+    df = _read_data(rows)
 
     return {'metadata': metadata, 'data': df}
 
 
-def read_metadata(rows: list) -> dict:
+def _read_metadata(rows: list) -> dict:
     metadata = dict()
     for i in range(7):
         row = rows[i]
@@ -34,7 +34,7 @@ def read_metadata(rows: list) -> dict:
     return metadata
 
 
-def read_data(rows: list) -> pd.DataFrame:
+def _read_data(rows: list) -> pd.DataFrame:
 # Get column labels to use for DataFrame, also get sample rate
     start = None
     end = None
