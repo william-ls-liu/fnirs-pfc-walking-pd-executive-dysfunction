@@ -12,7 +12,7 @@ def process(data: dict, short_chs: list):
     short_data, long_data, events = _transform_data(raw, short_chs)
     short_channel_corrected = short_channel_correction(long_data, short_data)
     tddr_corrected = tddr(data=short_channel_corrected, sample_rate=sample_rate)
-    filtered = fir_filter(data=tddr_corrected)
+    filtered = fir_filter(data=tddr_corrected, fs=sample_rate)
 
     return filtered
 
