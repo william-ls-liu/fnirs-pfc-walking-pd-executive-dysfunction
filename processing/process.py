@@ -1,5 +1,5 @@
-from short_channel_correction import short_channel_correction
-from tddr import tddr
+from .short_channel_correction import short_channel_correction
+from .tddr import tddr
 import pandas as pd
 import re
 
