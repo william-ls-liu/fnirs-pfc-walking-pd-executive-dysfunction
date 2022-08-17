@@ -1,9 +1,10 @@
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 import math
+import pandas as pd
 
 
-def tddr(data: np.array, sample_rate: int) -> np.array:
+def tddr(data: pd.DataFrame, sample_rate: int) -> pd.DataFrame:
     """
     Apply Temporal Derivative Distribution Repair algorithm.
 
@@ -12,11 +13,22 @@ def tddr(data: np.array, sample_rate: int) -> np.array:
     method for fNIRS. NeuroImage, 184, 171-179.
     https://doi.org/10.1016/j.neuroimage.2018.09.025
     """
+    corrected_df = data.copy()
+    chs = list(data.columns)
+    for ch in chs:
+        if data[ch].dtype == np.float64:
+            ch_asarray = np.array(data[ch], dtype='float64')
+            corrected_df[ch] = _tddr(ch_asarray, sample_rate)
+    
+    return corrected_df
+
+
+def _tddr(data: np.array, sample_rate: int) -> np.array:
+    """Helper method to run the TDDR algorithm."""
+
     signal = np.array(data)
     if len(signal.shape) != 1:
-        for ch in range(signal.shape[1]):
-            signal[:, ch] = tddr(signal[:, ch], sample_rate)
-        return signal
+        raise ValueError(f"Shape of provided data is {signal.shape}, should be 1.")
 
     # Preprocess: Separate high and low frequencies
     filter_cutoff = .5
