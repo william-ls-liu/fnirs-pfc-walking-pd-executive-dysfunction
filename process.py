@@ -1,20 +1,21 @@
 from short_channel_correction import short_channel_correction
+from tddr import tddr
 import pandas as pd
 import re
-import numpy as np
-from typing import Union
 
 
 def process(data: dict, short_chs: list):
     raw = data['data']
     metadata = data['metadata']
+    sample_rate = int(float(metadata['Datafile sample rate:']))
     short_data, long_data, events = _transform_data(raw, short_chs)
     short_channel_corrected = short_channel_correction(long_data, short_data)
+    tddr_corrected = tddr(data=short_channel_corrected, sample_rate=sample_rate)
 
-    return short_channel_corrected
+    return tddr_corrected
 
 
-def _transform_data(df: pd.DataFrame, short_chs: list) -> Union[np.array, pd.DataFrame]:
+def _transform_data(df: pd.DataFrame, short_chs: list) -> pd.DataFrame:
     """
     Separate raw data into separate DataFrames for the long and short channels. Return a separate DataFrame with only 
     the rows containing Event markers.
