@@ -28,7 +28,7 @@ def _tddr(data: np.array, sample_rate: int) -> np.array:
 
     signal = np.array(data)
     if len(signal.shape) != 1:
-        raise ValueError(f"Shape of provided data is {signal.shape}, should be 1.")
+        raise ValueError(f"Length of shape of provided data is {len(signal.shape)}, should be 1.")
 
     # Preprocess: Separate high and low frequencies
     filter_cutoff = .5
