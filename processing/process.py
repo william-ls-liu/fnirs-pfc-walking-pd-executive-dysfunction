@@ -23,7 +23,7 @@ def process(data: dict, short_chs: list):
     filtered = fir_filter(data=tddr_corrected, fs=sample_rate)
     baseline = baseline_subtraction(data=filtered, events=events, frames_to_drop=sample_rate)
 
-    return baseline, filtered, events
+    return baseline, events
 
 
 def _transform_data(df: pd.DataFrame, short_chs: list) -> pd.DataFrame:
