@@ -1,6 +1,7 @@
 from .short_channel_correction import short_channel_correction
 from .tddr import tddr
 from .filter import fir_filter
+from .baseline import baseline_subtraction
 import pandas as pd
 import re
 
@@ -20,8 +21,9 @@ def process(data: dict, short_chs: list):
     short_channel_corrected = short_channel_correction(long_data, short_data)
     tddr_corrected = tddr(data=short_channel_corrected, sample_rate=sample_rate)
     filtered = fir_filter(data=tddr_corrected, fs=sample_rate)
+    baseline = baseline_subtraction(data=filtered, events=events, frames_to_drop=sample_rate)
 
-    return filtered
+    return baseline, filtered, events
 
 
 def _transform_data(df: pd.DataFrame, short_chs: list) -> pd.DataFrame:
