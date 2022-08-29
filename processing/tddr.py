@@ -25,7 +25,6 @@ def tddr(data: pd.DataFrame, sample_rate: int) -> pd.DataFrame:
 
 def _tddr(data: np.array, sample_rate: int) -> np.array:
     """Helper method to run the TDDR algorithm."""
-
     signal = np.array(data)
     if len(signal.shape) != 1:
         raise ValueError(f"Length of shape of provided data is {len(signal.shape)}, should be 1.")
