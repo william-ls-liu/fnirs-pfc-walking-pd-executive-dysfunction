@@ -9,7 +9,7 @@ def process(data: dict, short_chs: list):
     """
     Helper method to run the processing algorithms.
 
-    :param data: dictionary with raw data and metadata, both as dataframes
+    :param data: dictionary with raw data (a dataframe) and metadata (a dict)
     :param short_chs: list of the short (reference) channels
     :return: dataframe of processed fNIRS data
     """
