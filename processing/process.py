@@ -22,9 +22,12 @@ def process(data: dict, short_chs: list):
     tddr_corrected = tddr(data=short_channel_corrected, sample_rate=sample_rate)
     filtered = fir_filter(data=tddr_corrected, fs=sample_rate)
     baseline = baseline_subtraction(data=filtered, events=events, frames_to_drop=sample_rate)
+    # Add event column to processed dataframe
+    baseline.insert(len(baseline.columns), 'Event', events['Event'])
     baseline.reset_index(inplace=True)
+    baseline.rename(columns={'index': 'Sample number'}, inplace=True)
 
-    return baseline, events
+    return baseline
 
 
 def _transform_data(df: pd.DataFrame, short_chs: list) -> pd.DataFrame:
