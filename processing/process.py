@@ -6,7 +6,7 @@ import pandas as pd
 import re
 
 
-def process(data: dict, short_chs: list):
+def process_fnirs(data: dict, short_chs: list):
     """
     Helper method to run the processing algorithms.
 
