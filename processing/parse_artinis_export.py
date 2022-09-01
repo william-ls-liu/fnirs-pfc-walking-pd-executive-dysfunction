@@ -68,6 +68,8 @@ def _read_data(rows: list) -> pd.DataFrame:
     # Create DataFrame
     data = rows[(end + 4):-1]  # Last line is empty, ignore it
     for idx, row in enumerate(data):
+        # The rows (lists) that contain event markers have an empty string as their
+        # last element. Pop this element to keep list length consistent among rows.
         if len(row) == len(col_labels) + 1:
             data[idx].pop()
         elif len(row) == len(col_labels):
