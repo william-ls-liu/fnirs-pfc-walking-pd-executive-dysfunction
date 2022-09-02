@@ -36,8 +36,12 @@ def read_mat(file_path: str) -> dict:
     df.insert(len(df.columns), 'Event', events)
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'Sample number'}, inplace=True)
+
+    # Get sample rate
+    fs = mat_dict['nirs_data']['Fs'][0, 0][0, 0]
+    metadata = {'Datafile sample rate:': fs}
     
-    return df
+    return {'metadata': metadata, 'data': df}
 
 
 def _get_events(raw: dict) -> pd.Series:
@@ -59,4 +63,3 @@ def _get_events(raw: dict) -> pd.Series:
     events = pd.Series(data=markers, index=peaks)
 
     return events
-    
