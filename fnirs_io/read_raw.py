@@ -1,5 +1,11 @@
-import pandas as pd
+# Author: William Liu <liwi@ohsu.edu>
 
+import pandas as pd
+import os
+
+def read_raw(file_path: str):
+    filename, file_extension = os.path.splitext(file_path)
+    print(filename, file_extension)
 
 def parse_artinis_export(file_path: str) -> pd.DataFrame:
     """Read the exported file from Artinis fNIRS software and parse into a pandas DataFrame."""
