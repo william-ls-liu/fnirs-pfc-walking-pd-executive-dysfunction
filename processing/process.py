@@ -50,6 +50,6 @@ def _transform_data(df: pd.DataFrame, short_chs: list) -> pd.DataFrame:
     long_data = df.filter(regex=long_regex)
 
     # DataFrame of events
-    events = df[df['Event'] != '']
+    events = df[df['Event'].notnull()]
 
     return short_data, long_data, events
