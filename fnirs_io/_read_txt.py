@@ -1,6 +1,7 @@
 # Author: William Liu <liwi@ohsu.edu>
 
 import pandas as pd
+import numpy as np
 
 def read_txt(file_path: str) -> dict:
     """
@@ -90,6 +91,8 @@ def _read_data(rows: list) -> pd.DataFrame:
     df.drop(df.index[range(sample_rate)], inplace=True)
     # Cast columns to most logical dtype
     df = df.apply(pd.to_numeric, errors='ignore')
+    # Replace '' with np.nan in the 'Event' columns
+    df.loc[df['Event'] == '', 'Event'] = np.nan
 
     return df
     
