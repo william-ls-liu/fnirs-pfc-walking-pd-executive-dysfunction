@@ -6,16 +6,6 @@ import math
 
 def fir_filter(data: pd.DataFrame, order=1000, Wn=[0.01, 0.1], 
                window='hamming', pass_zero='bandpass', fs=50) -> pd.DataFrame:
-    print(f"""
-    Building FIR Filter with following parameters
-    ---------------------------------------------
-    Order: {order}
-    Cutoff frequency(ies): {Wn}
-    Window: {window}
-    Type: {pass_zero}
-    Sample rate: {fs}
-    """)
-
     taps = order + 1
     filt = signal.firwin(taps, Wn, pass_zero=pass_zero, fs=fs)
 
