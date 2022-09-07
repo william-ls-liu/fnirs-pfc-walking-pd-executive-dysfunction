@@ -17,7 +17,7 @@ def calculate_statistics(segments: dict) -> pd.DataFrame:
     """
     # Store iterables used to creates a pandas hierarchical index later on
     multi_index = dict()
-    multi_index['Metrics'] = ['Mean', 'Median', 'StDev', 'Range', 'Detrended Mean']
+    multi_index['Metrics'] = ['Mean', 'Median', 'StDev', 'Range', 'Detrended']
     # Dict to store the metrics, used to build final dataframe
     metrics = dict()
     for key, val in segments.items():
