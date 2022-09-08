@@ -24,6 +24,9 @@ def read_txt(file_path: str) -> dict:
     metadata = _read_metadata(rows)
     df = _read_data(rows)
 
+    # Add info to metadata
+    metadata['Export file'] = file_path
+
     return {'metadata': metadata, 'data': df}
 
 
@@ -36,7 +39,8 @@ def _read_metadata(rows: list) -> dict:
         elif 'OxySoft export of:' in row:
             metadata['Original file'] = row[1]
         else:
-            metadata[row[0]] = row[1]
+            # Remove trailing ":" before setting as key
+            metadata[row[0].split(':')[0]] = row[1]
 
     return metadata
 
