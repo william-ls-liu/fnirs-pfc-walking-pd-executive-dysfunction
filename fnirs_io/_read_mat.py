@@ -39,7 +39,7 @@ def read_mat(file_path: str) -> dict:
 
     # Get sample rate
     fs = mat_dict['nirs_data']['Fs'][0, 0][0, 0]
-    metadata = {'Datafile sample rate:': fs}
+    metadata = {'Datafile sample rate': fs, 'Export file': file_path}
     
     return {'metadata': metadata, 'data': df}
 
