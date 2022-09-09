@@ -35,8 +35,8 @@ def process_fnirs(data: dict, short_chs: list):
 
 def _transform_data(df: pd.DataFrame, metadata: dict, short_chs: list) -> pd.DataFrame:
     """
-    Separate raw data into separate DataFrames for the long and short channels. Return a separate DataFrame with only 
-    the rows containing Event markers.
+    Separate raw data into separate DataFrames for the long and short channels. Return 
+    a separate DataFrame with only the rows containing Event markers.
     """
     df = df.copy()
     # Get DataFrame with only the short channels
