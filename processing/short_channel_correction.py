@@ -1,11 +1,20 @@
+# Author: William Liu <liwi@ohsu.edu>
+
 import numpy as np
 import pandas as pd
 import re
 
-
 def short_channel_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
     """
-    Add docstring with sources for scholkmann 2014 and sager and berger 2005
+    Apply short channel correction technique to remove the superficial component of
+    the probed tissue.
+
+    Felix Scholkmann et al 2014 Physiol. Meas. 35 717
+
+    :param long_data: dataframe containing fNIRS data for the long channels
+    :param short_data: dataframe containing fNIRS data for the short reference
+                       channels
+    :return: dataframe of corrected long channels
     """
     corrected_df = long_data.copy()
     long_chs = list(long_data.columns)
@@ -30,3 +39,5 @@ def _find_short(long_ch: str, short_data: pd.DataFrame):
     for short_ch in short_chs:
         if re.match(regex, short_ch):
             return short_ch
+
+    raise KeyError (f"Could not find matching short channel for {long_ch}")
