@@ -64,10 +64,11 @@ def _get_events(raw: dict) -> pd.Series:
     """
     raw_event_signal = raw['nirs_data']['ADvalues'][0, 0][:, 1]
     peaks, _ = signal.find_peaks(raw_event_signal, height=0.02)
-    if len(peaks) != 3:
-        raise ValueError(f"Found {len(peaks)}, expected 3.")
     markers = ['S1', 'W1', 'S2']
-    events = pd.Series(data=markers, index=peaks)
+    used_markers = list()
+    for i, _ in enumerate(peaks):
+        used_markers.append(markers[i])
+    events = pd.Series(data=used_markers, index=peaks)
 
     return events
 
