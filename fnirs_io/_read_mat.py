@@ -62,6 +62,12 @@ def _get_events(raw: dict) -> pd.Series:
     :param raw: a dictionary of loaded .mat data
     :return: a pd.Series containing the frames where events were marked
     """
+    # If column containing event signal is not present, return series that will
+    # make entire 'Event' column np.nan
+    if raw['nirs_data']['ADvalues'][0, 0].shape[1] != 3:
+        events = pd.Series(data=[np.nan])
+        return events
+
     raw_event_signal = raw['nirs_data']['ADvalues'][0, 0][:, 1]
     peaks, _ = signal.find_peaks(raw_event_signal, height=0.02)
     markers = ['S1', 'W1', 'S2']
