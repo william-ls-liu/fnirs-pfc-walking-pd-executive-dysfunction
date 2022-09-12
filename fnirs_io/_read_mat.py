@@ -4,6 +4,7 @@ import pandas as pd
 import scipy.io as sio
 import scipy.signal as signal
 import numpy as np
+import math
 
 def read_mat(file_path: str) -> dict:
     """
@@ -14,6 +15,10 @@ def read_mat(file_path: str) -> dict:
     """
     # Load the .mat file into a dictionary
     mat_dict = sio.loadmat(file_path)
+
+    # Get metadata
+    fs = mat_dict['nirs_data']['Fs'][0, 0][0, 0]
+    metadata = {'Datafile sample rate': fs, 'Export file': file_path}
 
     # Get the channel labels. 'labels' is an array of arrays
     # so need to unpack into a list.
@@ -37,11 +42,13 @@ def read_mat(file_path: str) -> dict:
     df.reset_index(inplace=True)
     df.rename(columns={'index': 'Sample number'}, inplace=True)
 
-    # Get sample rate
-    fs = mat_dict['nirs_data']['Fs'][0, 0][0, 0]
-    metadata = {'Datafile sample rate': fs, 'Export file': file_path}
+    # Drop initial ~1s of recording
+    df.drop(df.index[range(fs)], inplace=True)
+
+    # Scale values
+    scaled_df = _scale_values(df)
     
-    return {'metadata': metadata, 'data': df}
+    return {'metadata': metadata, 'data': scaled_df}
 
 
 def _get_events(raw: dict) -> pd.Series:
@@ -63,3 +70,19 @@ def _get_events(raw: dict) -> pd.Series:
     events = pd.Series(data=markers, index=peaks)
 
     return events
+
+
+def _scale_values(df: pd.DataFrame) -> pd.DataFrame:
+    """Scale the output by subtracing the mean of initial 15 frames."""
+    scaled = df.copy()
+    for ch in list(scaled.columns):
+        if 'Sample number' in ch or 'Event' in ch:
+            continue
+        ch_asarray = np.array(df[ch], dtype=np.float64)
+        initial_frames = ch_asarray[:15]
+        mean = math.fsum(initial_frames) / len(initial_frames)
+        ch_asarray -= mean
+        scaled[ch] = ch_asarray
+    
+    return scaled
+    
