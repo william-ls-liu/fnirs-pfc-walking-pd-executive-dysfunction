@@ -27,6 +27,8 @@ def process_fnirs(data: dict, short_chs: list):
     baseline = baseline_subtraction(data=filtered, events=events, frames_to_drop=sample_rate)
     # Add event column to processed dataframe
     baseline.insert(len(baseline.columns), 'Event', events['Event'])
+    # Reset the index to start at zero, but keep original index as a column because it refers
+    # to the sample number.
     baseline.reset_index(inplace=True)
     baseline.rename(columns={'index': 'Sample number'}, inplace=True)
 
@@ -70,7 +72,7 @@ def _verify_events(df: pd.DataFrame, events: pd.DataFrame, metadata: dict) -> pd
     :return: dataframe of events, with "artificial" events added if necessary
     """
     df = df.copy()
-    fname, ftype = os.path.splitext(metadata['Export file'])
+    _, ftype = os.path.splitext(metadata['Export file'])
     fs = int(float(metadata['Datafile sample rate']))
 
     # Define length of segments (secs) based on protocol
@@ -84,34 +86,48 @@ def _verify_events(df: pd.DataFrame, events: pd.DataFrame, metadata: dict) -> pd
     if len(events) == 3:
         return events
     # If only two events were found, check to see which marker is
-    # missing, then add an 'artificial'
+    # missing, then add an 'artificial' marker
     elif len(events) == 2:
-        first = events['Sample number'].iloc[0]
-        second = events['Sample number'].iloc[1]
-        diff = second - first
+        found_1 = events['Sample number'].iloc[0]
+        found_2 = events['Sample number'].iloc[1]
+        diff = found_2 - found_1
         # If user forgot to input the last marker
-        if diff < (30 * fs) and diff > (15 * fs):
-            missing = second + (walk * fs)
-            df.loc[missing, 'Event'] = 'Marker Added'
-            events = df[df['Event'].notnull()]
-            return events
+        if diff < (25 * fs):
+            missing = found_2 + (walk * fs)
         # If the user forgot to input the first marker
-        elif diff < (130 * fs) and diff > (110 * fs):
-            missing = first - (quiet * fs)
-            df.loc[missing, 'Event'] = 'Marker Added'
-            events = df[df['Event'].notnull()]
-            return events
+        elif diff < (125 * fs):
+            missing = found_1 - (quiet * fs)
         # If the user forgot to input the middle marker
         else:
-            missing = first + (quiet * fs)
-            df.loc[missing, 'Event'] = 'Marker Added'
-            events = df[df['Event'].notnull()]
-            return events
-    # If 1 event, or no events, were found, add in three events
-    # based on protocol timing
+            missing = found_1 + (quiet * fs)
+
+        df.loc[missing, 'Event'] = 'Marker Added'
+        events = df[df['Event'].notnull()]
+        return events
+    elif len(events) == 1:
+        found = events['Sample number'].iloc[0]
+        # If found marker in initial 25s of recording, assume
+        # it is the marker denoting start of quiet stance.
+        if found < (25 * fs):
+            m1 = found + (quiet * fs)
+            m2 = m1 + (walk * fs)
+        # If found marker after 25s, but in initial 45s of recording,
+        # assume it is marker denoting start of walking
+        elif found < (45 * fs):
+            m1 = found - (quiet * fs)
+            m2 = found + (walk * fs)
+        # Otherwise, assume it is the marker denoting end of walking
+        else:
+            m2 = found - (walk * fs)
+            m1 = m2 - (quiet * fs)
+
+        df.loc[[m1, m2], 'Event'] = 'Marker Added'
+        events = df[df['Event'].notnull()]
+        return events
+    # If no events were found, add in three events based on protocol timing
     else:
         df['Event'] = np.nan
-        first = 3 * fs  # First marker is 3 seconds into recording
+        first = 4 * fs  # First marker is ~4 seconds into recording
         second = first + (quiet * fs)
         third = second + (walk * fs)
         df.loc[[first, second, third], 'Event'] = 'Marker Added'
