@@ -1,8 +1,9 @@
 # Author: William Liu <liwi@ohsu.edu>
 
+import math
 import pandas as pd
 import numpy as np
-import math
+
 
 def calculate_statistics(segments: dict) -> pd.DataFrame:
     """
@@ -41,10 +42,14 @@ def calculate_statistics(segments: dict) -> pd.DataFrame:
             else:
                 metrics[col] = metrics_as_list
 
-    index = pd.MultiIndex.from_product([multi_index['Segment'], multi_index['Metrics']], names=['Segment', 'Metric'])
+    index = pd.MultiIndex.from_product(
+        [multi_index['Segment'], multi_index['Metrics']],
+        names=['Segment', 'Metric']
+        )
     df = pd.DataFrame(data=metrics, index=index)
 
     return df
+
 
 def detrended_mean(data):
     """
@@ -62,5 +67,5 @@ def detrended_mean(data):
     diff = np.diff(x)
     # Step 3. Take the mean
     mean = math.fsum(diff) / len(diff)
-    
+
     return mean
