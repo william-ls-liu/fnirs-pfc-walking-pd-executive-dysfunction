@@ -1,10 +1,11 @@
 # Author: William Liu <liwi@ohsu.edu>
 
+import math
 import pandas as pd
 import scipy.io as sio
 import scipy.signal as signal
 import numpy as np
-import math
+
 
 def read_mat(file_path: str) -> dict:
     """
@@ -32,8 +33,12 @@ def read_mat(file_path: str) -> dict:
     dxyvals = mat_dict['nirs_data']['dxyvals'][0, 0]
 
     # Create dataframe for oxy and dxy, then merge
-    oxy = pd.DataFrame(data=oxyvals, columns=[s + ' O2Hb' for s in labels_list])
-    dxy = pd.DataFrame(data=dxyvals, columns=[s + ' HHb' for s in labels_list])
+    oxy = pd.DataFrame(
+        data=oxyvals, columns=[s + ' O2Hb' for s in labels_list]
+        )
+    dxy = pd.DataFrame(
+        data=dxyvals, columns=[s + ' HHb' for s in labels_list]
+        )
     df = pd.concat([oxy, dxy], axis=1)
 
     # Get event markers, add to dataframe
@@ -49,7 +54,7 @@ def read_mat(file_path: str) -> dict:
 
     # Scale values
     scaled_df = _scale_values(df)
-    
+
     return {'metadata': metadata, 'data': scaled_df}
 
 
@@ -101,6 +106,5 @@ def _scale_values(df: pd.DataFrame) -> pd.DataFrame:
         mean = math.fsum(initial_frames) / len(initial_frames)
         ch_asarray -= mean
         scaled[ch] = ch_asarray
-    
+
     return scaled
-    
