@@ -1,11 +1,12 @@
 # Author: William Liu <liwi@ohsu.edu>
 
 import math
+import os
 import pandas as pd
 import numpy as np
 
 
-def calculate_statistics(segments: dict) -> pd.DataFrame:
+def calculate_statistics(segments: dict, file: str) -> pd.DataFrame:
     """
     Calculate statistics for each segment. Metrics include mean, median,
     standard deviation, range, and mean of the detrended time series.
@@ -14,41 +15,36 @@ def calculate_statistics(segments: dict) -> pd.DataFrame:
     and Stability in Patients With Parkison Disease.
 
     :param segments: dictionary of processed fNIRS data, split into segments
+    :param file: path to data file
     :return: dataframe of statistics, calculted for each segment
     """
-    # Store iterables used to creates a pandas hierarchical index later on
-    multi_index = dict()
-    multi_index['Metrics'] = ['Mean', 'Median', 'StDev', 'Range', 'Detrended']
-    # Dict to store the metrics, used to build final dataframe
-    metrics = dict()
-    for key, val in segments.items():
-        if 'Segment' in multi_index:
-            multi_index['Segment'].append(key)
-        else:
-            multi_index['Segment'] = [key]
+    # Get filename
+    name = os.path.basename(file)
 
-        for col in list(val.columns):
+    # Initialize dict to store calculations
+    data_as_dict = dict()
+
+    for seg, df in segments.items():
+        for col in list(df.columns):
             if 'Sample number' in col or 'Event' in col:
                 continue
-            data = np.array(val[col], dtype=np.float64)
-            mean = math.fsum(data) / len(data)
-            median = np.median(data)
-            std = np.std(data, dtype=np.float64)
-            r = np.ptp(data)
-            detrended = detrended_mean(data)
-            metrics_as_list = [mean, median, std, r, detrended]
-            if col in metrics:
-                metrics[col].extend(metrics_as_list)
-            else:
-                metrics[col] = metrics_as_list
+            label = seg + ' ' + col
+            values = np.array(df[col], dtype=np.float64)
+            mean = math.fsum(values) / len(values)
+            median = np.median(values)
+            std = np.std(values, dtype=np.float64)
+            r = np.ptp(values)
+            detrended = detrended_mean(values)
+            # Populate dictionary
+            data_as_dict[label + ' Mean'] = mean
+            data_as_dict[label + ' Median'] = median
+            data_as_dict[label + ' StDev'] = std
+            data_as_dict[label + ' Range'] = r
+            data_as_dict[label + ' Detrended'] = detrended
 
-    index = pd.MultiIndex.from_product(
-        [multi_index['Segment'], multi_index['Metrics']],
-        names=['Segment', 'Metric']
-        )
-    df = pd.DataFrame(data=metrics, index=index)
+    ret_df = pd.DataFrame(data=data_as_dict, index=[name])
 
-    return df
+    return ret_df
 
 
 def detrended_mean(data):
