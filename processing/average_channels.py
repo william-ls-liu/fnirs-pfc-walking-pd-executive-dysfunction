@@ -7,14 +7,14 @@ import numpy as np
 def average_channels(df: pd.DataFrame) -> pd.DataFrame:
     """
     Average channels across each hemisphere and the entire brain (grand).
-    
+
     :param df: dataframe of processed fnirs, without short channels
     :return: dataframe of averaged channels
     """
     if type(df) != pd.DataFrame:
         raise TypeError(f"Must provide a dataframe, not {type(df)}")
 
-    # Create dictionary of averaged channels    
+    # Create dictionary of averaged channels
     dict_for_df = {
         'Sample number': df['Sample number'],
         'right oxy': np.mean(df.filter(regex='Rx1-Tx[0-9] O2Hb'), axis=1),

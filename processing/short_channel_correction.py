@@ -4,10 +4,11 @@ import numpy as np
 import pandas as pd
 import re
 
-def short_channel_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
+
+def ssc_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
     """
-    Apply short channel correction technique to remove the superficial component of
-    the probed tissue.
+    Apply short channel correction technique to remove the superficial
+    component of the probed tissue.
 
     Felix Scholkmann et al 2014 Physiol. Meas. 35 717
 
@@ -23,7 +24,9 @@ def short_channel_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
         long_array = np.array(long_data[long_ch], dtype='float64')
         short_array = np.array(short_data[short_ch], dtype='float64')
 
-        alpha = np.dot(short_array, long_array) / np.dot(short_array, short_array)
+        alpha = (
+            np.dot(short_array, long_array) / np.dot(short_array, short_array)
+            )
         corrected = long_array - (alpha * short_array)
         corrected_df[long_ch] = corrected
 
@@ -40,4 +43,4 @@ def _find_short(long_ch: str, short_data: pd.DataFrame):
         if re.match(regex, short_ch):
             return short_ch
 
-    raise KeyError (f"Could not find matching short channel for {long_ch}")
+    raise KeyError(f"Could not find matching short channel for {long_ch}")
