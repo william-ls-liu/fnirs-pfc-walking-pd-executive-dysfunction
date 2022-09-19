@@ -132,3 +132,4 @@ test_data/
 *.ipynb
 notebooks/
 /.vscode
+export.py
