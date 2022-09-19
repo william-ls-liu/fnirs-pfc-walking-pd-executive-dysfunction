@@ -17,12 +17,14 @@ def ssc_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
                        channels
     :return: dataframe of corrected long channels
     """
+    short_data_copy = short_data.copy()
+    long_data_copy = long_data.copy()
     corrected_df = long_data.copy()
     long_chs = list(long_data.columns)
     for long_ch in long_chs:
-        short_ch = _find_short(long_ch, short_data)
-        long_array = np.array(long_data[long_ch], dtype='float64')
-        short_array = np.array(short_data[short_ch], dtype='float64')
+        short_ch = _find_short(long_ch, short_data_copy)
+        long_array = np.array(long_data_copy[long_ch], dtype='float64')
+        short_array = np.array(short_data_copy[short_ch], dtype='float64')
 
         alpha = (
             np.dot(short_array, long_array) / np.dot(short_array, short_array)
