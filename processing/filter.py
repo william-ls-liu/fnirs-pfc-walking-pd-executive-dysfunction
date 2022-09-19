@@ -8,7 +8,7 @@ import scipy.signal as signal
 def fir_filter(data: pd.DataFrame, order=1000, Wn=[0.01, 0.1],
                window='hamming', pass_zero='bandpass', fs=50) -> pd.DataFrame:
     taps = order + 1
-    filt = signal.firwin(taps, Wn, pass_zero=pass_zero, fs=fs)
+    filt = signal.firwin(taps, Wn, window=window, pass_zero=pass_zero, fs=fs)
 
     # Apply the filter
     filtered_df = data.copy()
