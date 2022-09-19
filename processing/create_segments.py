@@ -11,16 +11,19 @@ def create_segments(df: pd.DataFrame) -> dict:
     :return: dict with keys as individual segments and values
              as dataframes with fnirs data for given segment
     """
+    df = df.copy()
     if type(df) != pd.DataFrame:
         raise TypeError(f"Must provide dataframe, not {type(df)}.")
-    
+
     events = df[df['Event'].notnull()]
     if len(events) != 3:
         raise IndexError(f"Expected 3 event markers, found {len(events)}.")
 
     # Define a dictionary to store dataframe for each segment
     segments = dict()
-    # Use event markers to define 2 segments. One is quiet stance, other is walking
+
+    # Use event markers to define 2 segments.
+    # One is quiet stance, other is walking.
     for idx, seg in enumerate(['Quiet Stance', 'Walking']):
         start = events.index[idx]
         end = events.index[idx + 1]
