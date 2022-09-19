@@ -14,16 +14,17 @@ def average_channels(df: pd.DataFrame) -> pd.DataFrame:
     if type(df) != pd.DataFrame:
         raise TypeError(f"Must provide a dataframe, not {type(df)}")
 
+    df_copy = df.copy()
     # Create dictionary of averaged channels
     dict_for_df = {
-        'Sample number': df['Sample number'],
-        'right oxy': np.mean(df.filter(regex='Rx1-Tx[0-9] O2Hb'), axis=1),
-        'right dxy': np.mean(df.filter(regex='Rx1-Tx[0-9] HHb'), axis=1),
-        'left oxy': np.mean(df.filter(regex='Rx2-Tx[0-9] O2Hb'), axis=1),
-        'left dxy': np.mean(df.filter(regex='Rx2-Tx[0-9] HHb'), axis=1),
-        'grand oxy': np.mean(df.filter(regex='O2Hb'), axis=1),
-        'grand dxy': np.mean(df.filter(regex='HHb'), axis=1),
-        'Event': df['Event']
+        'Sample number': df_copy['Sample number'],
+        'right oxy': np.mean(df_copy.filter(regex='Rx1-Tx[0-9] O2Hb'), axis=1),
+        'right dxy': np.mean(df_copy.filter(regex='Rx1-Tx[0-9] HHb'), axis=1),
+        'left oxy': np.mean(df_copy.filter(regex='Rx2-Tx[0-9] O2Hb'), axis=1),
+        'left dxy': np.mean(df_copy.filter(regex='Rx2-Tx[0-9] HHb'), axis=1),
+        'grand oxy': np.mean(df_copy.filter(regex='O2Hb'), axis=1),
+        'grand dxy': np.mean(df_copy.filter(regex='HHb'), axis=1),
+        'Event': df_copy['Event']
     }
 
     ret_df = pd.DataFrame(dict_for_df)
