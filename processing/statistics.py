@@ -25,6 +25,8 @@ def calculate_statistics(segments: dict, file: str) -> pd.DataFrame:
     data_as_dict = dict()
 
     for seg, df in segments.items():
+        if seg == 'Quiet Stance':
+            continue
         for col in list(df.columns):
             if 'Sample number' in col or 'Event' in col:
                 continue
