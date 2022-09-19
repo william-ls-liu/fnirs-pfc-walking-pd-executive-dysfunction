@@ -1,3 +1,5 @@
+# Author: William Liu <liwi@ohsu.edu>
+
 import numpy as np
 from scipy.signal import butter, sosfiltfilt
 import math
@@ -14,27 +16,34 @@ def tddr(data: pd.DataFrame, sample_rate: int) -> pd.DataFrame:
     https://doi.org/10.1016/j.neuroimage.2018.09.025
     """
     corrected_df = data.copy()
-    chs = list(data.columns)
+    chs = list(corrected_df.columns)
     for ch in chs:
-        if data[ch].dtype == np.float64:
-            ch_asarray = np.array(data[ch], dtype='float64')
+        if corrected_df[ch].dtype == np.float64:
+            ch_asarray = np.array(corrected_df[ch], dtype='float64')
             corrected_df[ch] = _tddr(ch_asarray, sample_rate)
-    
+
     return corrected_df
 
 
 def _tddr(data: np.array, sample_rate: int) -> np.array:
-    """Helper method to run the TDDR algorithm."""
+    """
+    Helper method to run the TDDR algorithm.
+
+    Based on https://github.com/frankfishburn/TDDR with only some slight
+    modifciations to ensure compatibility.
+    """
     signal = np.array(data)
     if len(signal.shape) != 1:
-        raise ValueError(f"Length of shape of provided data is {len(signal.shape)}, should be 1.")
+        raise ValueError(f"""Length of shape of provided data is
+                             {len(signal.shape)}, should be 1.""")
 
     # Preprocess: Separate high and low frequencies
     filter_cutoff = .5
     filter_order = 3
     signal_mean = math.fsum(signal) / len(signal)
     signal -= signal_mean
-    sos = butter(N=filter_order, Wn=filter_cutoff, output='sos', fs=sample_rate)
+    sos = butter(N=filter_order, Wn=filter_cutoff,
+                 output='sos', fs=sample_rate)
     signal_low = sosfiltfilt(sos, signal)
     signal_high = signal - signal_low
 
@@ -71,7 +80,8 @@ def _tddr(data: np.array, sample_rate: int) -> np.array:
         # Step 3e. Calculate new weights according to Tukey's biweight function
         w = ((1 - r**2) * (r < 1)) ** 2
 
-        # Step 3f. Terminate if new estimate is within machine-precision of old estimate
+        # Step 3f. Terminate if new estimate is within machine-precision of
+        # old estimate
         if abs(mu - mu0) < D * max(abs(mu), abs(mu0)):
             break
 
@@ -82,7 +92,9 @@ def _tddr(data: np.array, sample_rate: int) -> np.array:
     signal_low_corrected = np.cumsum(np.insert(new_deriv, 0, 0.0))
 
     # Postprocess: Center the corrected signal
-    signal_low_corrected_mean = math.fsum(signal_low_corrected) / len(signal_low_corrected)
+    signal_low_corrected_mean = (
+        math.fsum(signal_low_corrected) / len(signal_low_corrected)
+        )
     signal_low_corrected = signal_low_corrected - signal_low_corrected_mean
 
     # Postprocess: Merge back with uncorrected high frequency component
