@@ -133,3 +133,4 @@ test_data/
 notebooks/
 /.vscode
 export.py
+*.xlsx
