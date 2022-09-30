@@ -3,10 +3,11 @@
 import pandas as pd
 import numpy as np
 
+
 def read_txt(file_path: str) -> dict:
     """
-    Read Artinis export of raw fNIRS data in the .txt format.
-    
+    Parse a .txt export of fNIRS data generated in Oxysoft.
+
     :param file_path: path to raw data file
     :return: dictionary of metadata and raw fnirs data
     """
@@ -31,9 +32,11 @@ def read_txt(file_path: str) -> dict:
 
 
 def _read_metadata(rows: list) -> dict:
+    # Copy to avoid accidental mutation to original list
+    rows_copy = [i for i in rows]
     metadata = dict()
     for i in range(7):
-        row = rows[i]
+        row = rows_copy[i]
         if '' in row:
             pass
         elif 'OxySoft export of:' in row:
@@ -46,11 +49,16 @@ def _read_metadata(rows: list) -> dict:
 
 
 def _read_data(rows: list) -> pd.DataFrame:
-# Get column labels to use for DataFrame, also get sample rate
+    # Copy to avoid accidental mutation to original list
+    rows_copy = [i for i in rows]
+
+    # Get column labels to use for DataFrame, also get sample rate
     start = None
     end = None
     sample_rate = None
-    for idx, row in enumerate(rows):
+
+    # Find the start/end indexes of the columns labels
+    for idx, row in enumerate(rows_copy):
         if "Datafile sample rate:" in row:
             sample_rate = int(float(row[1]))
         elif "(Sample number)" in row:
@@ -58,12 +66,13 @@ def _read_data(rows: list) -> pd.DataFrame:
         elif "(Event)" in row:
             end = idx
             break
+
     if start is not None and end is not None and sample_rate is not None:
-        col_labels = rows[start:(end + 1)]
+        col_labels = rows_copy[start:(end + 1)]
         col_labels = [i[1] for i in col_labels]
     else:
-        raise ValueError(f"""Could not find start, end, or sample rate in the .txt file. 
-        Start: {start}, end: {end}, sample_rate: {sample_rate}""")
+        raise ValueError(f"""Could not find start, end, or sample rate in the
+        .txt file. Start: {start}, end: {end}, sample_rate: {sample_rate}""")
 
     # Remove extra characters from column labels
     for idx, label in enumerate(col_labels):
@@ -77,18 +86,18 @@ def _read_data(rows: list) -> pd.DataFrame:
             raise KeyError(f"Unexpected value found in column labels: {label}")
 
     # Create DataFrame
-    data = rows[(end + 4):-1]  # Last line is empty, ignore it
+    data = rows_copy[(end + 4):-1]  # Last line is empty, ignore it
     for idx, row in enumerate(data):
-        # The rows (lists) that contain event markers have an empty string as their
-        # last element. Pop this element to keep list length consistent among rows.
+        # The rows (lists) that contain event markers have an empty string as
+        # their last element. Pop this element to keep list length consistent.
         if len(row) == len(col_labels) + 1:
             data[idx].pop()
         elif len(row) == len(col_labels):
             pass
         else:
-            raise ValueError(f"""Unexpected number of items in row {idx}. 
+            raise ValueError(f"""Unexpected number of items in row {idx}.
             Expected {len(col_labels)}, found {len(row)}.""")
-    
+
     df = pd.DataFrame(data=data, columns=col_labels)
 
     # Drop initial 1 second of recording
@@ -99,4 +108,3 @@ def _read_data(rows: list) -> pd.DataFrame:
     df.loc[df['Event'] == '', 'Event'] = np.nan
 
     return df
-    
