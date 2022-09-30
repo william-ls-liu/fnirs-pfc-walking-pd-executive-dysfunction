@@ -101,7 +101,7 @@ def _scale_values(df: pd.DataFrame) -> pd.DataFrame:
     for ch in list(scaled.columns):
         if 'Sample number' in ch or 'Event' in ch:
             continue
-        ch_asarray = np.array(df[ch], dtype=np.float64)
+        ch_asarray = np.array(scaled[ch], dtype=np.float64)
         initial_frames = ch_asarray[:15]
         mean = math.fsum(initial_frames) / len(initial_frames)
         ch_asarray -= mean
