@@ -18,8 +18,8 @@ def process_fnirs(data: dict, short_chs: list):
     :param short_chs: list of the short (reference) channels
     :return: dataframe of processed fNIRS data
     """
-    raw = data['data']
-    metadata = data['metadata']
+    raw = data['data'].copy()
+    metadata = data['metadata'].copy()
     sample_rate = int(float(metadata['Datafile sample rate']))
     short_data, long_data, events = _transform_data(raw, metadata, short_chs)
     short_channel_corrected = ssc_correction(long_data, short_data)
@@ -99,10 +99,10 @@ def _verify_events(df: pd.DataFrame,
         found_2 = events_copy['Sample number'].iloc[1]
         diff = found_2 - found_1
         # If user forgot to input the last marker
-        if diff < (25 * fs):
+        if diff < ((quiet + 10) * fs):
             missing = found_2 + (walk * fs)
         # If the user forgot to input the first marker
-        elif diff < (125 * fs):
+        elif diff < ((walk + 10) * fs):
             missing = found_1 - (quiet * fs)
         # If the user forgot to input the middle marker
         else:
@@ -113,12 +113,12 @@ def _verify_events(df: pd.DataFrame,
         return events_copy
     elif len(events_copy) == 1:
         found = events_copy['Sample number'].iloc[0]
-        # If found marker in initial 25s of recording, assume
+        # If found marker in initial 20s of recording, assume
         # it is the marker denoting start of quiet stance.
-        if found < (25 * fs):
+        if found < ((quiet) * fs):
             m1 = found + (quiet * fs)
             m2 = m1 + (walk * fs)
-        # If found marker after 25s, but in initial 45s of recording,
+        # If found marker after 20s, but in initial 45s of recording,
         # assume it is marker denoting start of walking
         elif found < (45 * fs):
             m1 = found - (quiet * fs)
