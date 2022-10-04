@@ -19,7 +19,6 @@ def ssc_regression(long_data: pd.DataFrame, short_data: pd.DataFrame):
     """
     short_data_copy = short_data.copy()
     long_data_copy = long_data.copy()
-    corrected_df = long_data.copy()
     long_chs = list(long_data.columns)
     for long_ch in long_chs:
         short_ch = _find_short(long_ch, short_data_copy)
@@ -29,10 +28,11 @@ def ssc_regression(long_data: pd.DataFrame, short_data: pd.DataFrame):
         alpha = (
             np.dot(short_array, long_array) / np.dot(short_array, short_array)
             )
-        corrected = long_array - (alpha * short_array)
-        corrected_df[long_ch] = corrected
 
-    return corrected_df
+        corrected = long_array - (alpha * short_array)
+        long_data_copy[long_ch] = corrected
+
+    return long_data_copy
 
 
 def _find_short(long_ch: str, short_data: pd.DataFrame):
