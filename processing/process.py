@@ -1,6 +1,6 @@
 # Author: William Liu <liwi@ohsu.edu>
 
-from .short_channel_correction import ssc_correction
+from .ssc_regression import ssc_regression
 from .tddr import tddr
 from .filter import fir_filter
 from .baseline import baseline_subtraction
@@ -22,7 +22,7 @@ def process_fnirs(data: dict, short_chs: list):
     metadata = data['metadata'].copy()
     sample_rate = int(float(metadata['Datafile sample rate']))
     short_data, long_data, events = _transform_data(raw, metadata, short_chs)
-    short_channel_corrected = ssc_correction(long_data, short_data)
+    short_channel_corrected = ssc_regression(long_data, short_data)
     tddr_corrected = tddr(short_channel_corrected, sample_rate)
     filtered = fir_filter(tddr_corrected, sample_rate)
     baseline = baseline_subtraction(filtered, events)
