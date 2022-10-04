@@ -5,7 +5,7 @@ import pandas as pd
 import re
 
 
-def ssc_correction(long_data: pd.DataFrame, short_data: pd.DataFrame):
+def ssc_regression(long_data: pd.DataFrame, short_data: pd.DataFrame):
     """
     Apply short channel correction technique to remove the superficial
     component of the probed tissue.
