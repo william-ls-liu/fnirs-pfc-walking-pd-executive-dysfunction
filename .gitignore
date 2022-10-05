@@ -137,4 +137,3 @@ export.py
 *.pdf
 *.png
 exclude.json
-unit_tests.py
