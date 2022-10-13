@@ -14,6 +14,6 @@ def fir_filter(data: pd.DataFrame, order=1000, Wn=[0.01, 0.1],
     filtered_df = data.copy()
     for ch in list(filtered_df.columns):
         ch_asarray = np.array(filtered_df[ch], dtype='float64')
-        filtered_df[ch] = signal.filtfilt(filt, [1], ch_asarray)
+        filtered_df[ch] = signal.filtfilt(filt, [1.0], ch_asarray)
 
     return filtered_df
