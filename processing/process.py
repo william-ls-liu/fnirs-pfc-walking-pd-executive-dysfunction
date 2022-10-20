@@ -21,13 +21,25 @@ def process_fnirs(data: dict, short_chs: list):
     raw = data['data'].copy()
     metadata = data['metadata'].copy()
     sample_rate = int(float(metadata['Datafile sample rate']))
+    # Split the raw data into 2 df's, one for ssc and one for long
     short_data, long_data, events = _transform_data(raw, metadata, short_chs)
-    short_channel_corrected = ssc_regression(long_data, short_data)
-    tddr_corrected = tddr(short_channel_corrected, sample_rate)
-    filtered = fir_filter(tddr_corrected, sample_rate)
+
+    # Perform MA correction on both the short and the long data
+    short_tddr = tddr(short_data, sample_rate)
+    long_tddr = tddr(long_data, sample_rate)
+
+    # Perfom ssc_regression with MA-corrected data
+    short_channel_corrected = ssc_regression(long_tddr, short_tddr)
+
+    # Apply bandpass filter
+    filtered = fir_filter(short_channel_corrected, sample_rate)
+
+    # Subtract baseline
     baseline = baseline_subtraction(filtered, events)
+
     # Add event column to processed dataframe
     baseline.insert(len(baseline.columns), 'Event', events['Event'])
+
     # Reset the index to start at zero, but keep original index as a column
     # because it refers to the sample number.
     baseline.reset_index(inplace=True)
