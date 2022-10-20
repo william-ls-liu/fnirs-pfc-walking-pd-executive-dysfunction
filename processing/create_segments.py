@@ -11,11 +11,11 @@ def create_segments(df: pd.DataFrame) -> dict:
     :return: dict with keys as individual segments and values
              as dataframes with fnirs data for given segment
     """
-    df = df.copy()
-    if type(df) != pd.DataFrame:
-        raise TypeError(f"Must provide dataframe, not {type(df)}.")
+    df_copy = df.copy()
+    if type(df_copy) != pd.DataFrame:
+        raise TypeError(f"Must provide dataframe, not {type(df_copy)}.")
 
-    events = df[df['Event'].notnull()]
+    events = df_copy[df_copy['Event'].notnull()]
     if len(events) != 3:
         raise IndexError(f"Expected 3 event markers, found {len(events)}.")
 
@@ -27,15 +27,15 @@ def create_segments(df: pd.DataFrame) -> dict:
     for idx, seg in enumerate(['Quiet Stance', 'Walking']):
         start = events.index[idx]
         end = events.index[idx + 1]
-        segments[seg] = df.iloc[start:end]
+        segments[seg] = df_copy.iloc[start:end]
     # Create early and late phase segments during walking
     start = events.index[1]
     end = events.index[2]
     gap = end - start
     mid = gap // 2
     mid += start
-    early = df.iloc[start:mid]
-    late = df.iloc[mid:end]
+    early = df_copy.iloc[start:mid]
+    late = df_copy.iloc[mid:end]
     # Add early and late to segments
     segments['early'] = early
     segments['late'] = late
