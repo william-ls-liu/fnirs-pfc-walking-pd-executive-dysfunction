@@ -132,7 +132,8 @@ test_data/
 *.ipynb
 notebooks/
 /.vscode
-export.py
+export_excel.py
+export_pdf.py
 *.xlsx
 *.pdf
 *.png
