@@ -137,4 +137,4 @@ export_pdf.py
 *.xlsx
 *.pdf
 *.png
-exclude.json
+*.json
