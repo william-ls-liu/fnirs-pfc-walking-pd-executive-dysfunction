@@ -58,7 +58,7 @@ def _transform_data(df: pd.DataFrame,
     df_copy = df.copy()
     # Get DataFrame with only the short channels
     short_regex = '|'.join(short_chs)
-    short_data = df_copy.filter(regex=short_regex)
+    short_data = df_copy.copy().filter(regex=short_regex)
 
     # Get DataFrame with only the long channels
     all_chs = list(df_copy.columns)
@@ -68,7 +68,7 @@ def _transform_data(df: pd.DataFrame,
             if not re.match(short_regex, ch):
                 long_chs.append(ch)
     long_regex = '|'.join(long_chs)
-    long_data = df_copy.filter(regex=long_regex)
+    long_data = df_copy.copy().filter(regex=long_regex)
 
     # DataFrame of events
     events = df_copy[df_copy['Event'].notnull()]
